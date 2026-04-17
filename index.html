@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nihongo Daily - Final Fixed</title>
+    <style>
+        :root { --p: #1a2a6c; --s: #ffafbd; --bg: #f4f7f6; --ok: #28a745; --err: #dc3545; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); margin: 0; padding: 10px; font-family: 'Segoe UI', sans-serif; }
+        
+        .card { max-width: 500px; margin: auto; background: white; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; min-height: 90vh; display: flex; flex-direction: column; }
+        
+        header { background: var(--p); color: white; padding: 20px 15px; text-align: center; border-bottom: 5px solid var(--s); }
+        .content { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
+        
+        /* Grid Menu Utama */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .item { background: #fff; border: 1px solid #eee; padding: 12px 5px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .item:active { transform: scale(0.95); background: #f9f9f9; }
+        .item span { font-size: 1.4rem; display: block; margin-bottom: 5px; }
+        .item b { font-size: 0.85rem; color: var(--p); }
+
+        /* Tombol */
+        .btn { width: 100%; padding: 14px; margin-bottom: 10px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .btn-p { background: var(--p); color: white; }
+        .btn-g { background: #e9ecef; color: #495057; margin-bottom: 15px; }
+        .btn-outline { background: transparent; border: 1px solid #ccc; color: #666; }
+        .btn-red { background: #fff1f1; color: var(--err); border: 1px solid var(--err); }
+
+        /* List Belajar */
+        .box { background: #fff; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid var(--s); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .jp { font-size: 1.15rem; font-weight: bold; color: var(--p); display: block; line-height: 1.8; }
+        .id { color: #666; font-size: 0.9rem; border-top: 1px dashed #eee; margin-top: 8px; padding-top: 8px; display: block; }
+        
+        /* Kuis */
+        .opt { width: 100%; padding: 15px; margin: 8px 0; border: 2px solid #f0f0f0; border-radius: 12px; background: white; text-align: left; font-size: 1rem; }
+        .right { background: #d4edda !important; border-color: var(--ok) !important; color: #155724; }
+        .wrong { background: #f8d7da !important; border-color: var(--err) !important; color: #721c24; }
+        
+        .hidden { display: none !important; }
+        #list-container { max-height: 65vh; overflow-y: auto; }
+        ruby rt { color: #e83e8c; font-size: 0.55em; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <header>
+        <h2 style="margin:0; font-size: 1.3rem;">NIHONGO DAILY</h2>
+        <div style="font-size:0.75rem; opacity:0.9; margin-top:5px;">13 Kategori • 130 Kalimat • Full Hiragana</div>
+    </header>
+
+    <div id="m-home" class="content">
+        <p style="font-weight:bold; color:var(--p); margin: 0 0 12px 0;">📍 Pilih Kategori Belajar:</p>
+        <div id="m-grid" class="grid"></div>
+        
+        <hr style="width:100%; border:0; border-top:1px solid #eee; margin: 10px 0 20px 0;">
+        
+        <p style="font-weight:bold; color:var(--p); margin: 0 0 12px 0;">✍️ Uji Kemampuan (Kuis):</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+            <button class="btn btn-p" onclick="startQuiz(10)">10</button>
+            <button class="btn btn-p" onclick="startQuiz(25)">25</button>
+            <button class="btn btn-p" onclick="startQuiz(50)">50</button>
+        </div>
+    </div>
+
+    <div id="m-study" class="content hidden">
+        <button class="btn btn-g" onclick="goHome()">⬅️ Kembali ke Menu</button>
+        <h3 id="st-title" style="text-align:center; color:var(--p); margin-top:0;"></h3>
+        <div id="list-container"></div>
+    </div>
+
+    <div id="m-quiz" class="content hidden">
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+            <b id="q-prog" style="color:#888"></b>
+            <b id="q-scr" style="color:var(--ok)">Skor: 0</b>
+        </div>
+        <div id="q-txt" style="font-size:1.2rem; font-weight:bold; text-align:center; margin: 20px 0; color:var(--p); min-height:60px;"></div>
+        <div id="q-opts"></div>
+        <div style="margin-top:20px;">
+            <button id="next-btn" class="btn btn-p hidden" onclick="renderQuiz()">Lanjut ➔</button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button class="btn btn-outline" onclick="showResult()">Selesai</button>
+                <button class="btn btn-red" onclick="resetQuiz()">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="m-res" class="content hidden" style="text-align:center; justify-content: center;">
+        <span style="font-size:4rem;">🏆</span>
+        <h2 style="margin:10px 0">SKOR KAMU</h2>
+        <div id="f-scr" style="font-size:5rem; font-weight:bold; color:var(--p)">0</div>
+        <p id="f-msg" style="color:#666; margin-bottom:30px; line-height:1.5;"></p>
+        <button class="btn btn-p" onclick="goHome()">Main Lagi</button>
+    </div>
+</div>
+
+<script>
+// DATABASE 130 KALIMAT
+const db = [
+    {c:"Airport", i:"✈️", j:"パスポートです", t:"Ini paspor saya"},
+    {c:"Airport", i:"✈️", j:"<ruby>搭乗<rt>とうじょう</rt></ruby>ゲートはどこですか？", t:"Gerbang keberangkatan di mana?"},
+    {c:"Airport", i:"✈️", j:"<ruby>両替<rt>りょうがえ</rt></ruby>をしたいです", t:"Saya ingin tukar uang"},
+    {c:"Airport", i:"✈️", j:"チェックインをお<ruby>願<rt>ねが</rt></ruby>いします", t:"Tolong bantu saya check-in"},
+    {c:"Airport", i:"✈️", j:"<ruby>荷物<rt>にもつ</rt></ruby>が<ruby>紛失<rt>ふんしつ</rt></ruby>しました", t:"Bagasi saya hilang"},
+    {c:"Airport", i:"✈️", j:"バスの<ruby>乗<rt>の</rt></ruby>り<ruby>場<rt>ば</rt></ruby>はどこですか？", t:"Di mana tempat naik bus?"},
+    {c:"Airport", i:"✈️", j:"チケットを<ruby>忘<rt>わす</rt></ruby>れました", t:"Tiket saya tertinggal"},
+    {c:"Airport", i:"✈️", j:"Ｗｉ－Ｆｉはありますか？", t:"Apakah ada Wi-Fi?"},
+    {c:"Airport", i:"✈️", j:"<ruby>乗継<rt>のりつぎ</rt></ruby>はどこですか？", t:"Transit di sebelah mana?"},
+    {c:"Airport", i:"✈️", j:"お<ruby>土産<rt>みやげ</rt></ruby><ruby>屋<rt>や</rt></ruby>さんはどこ？", t:"Toko oleh-oleh di mana?"},
+
+    {c:"Bank/ATM", i:"🏧", j:"ＡＴＭはどこですか？", t:"Di mana ada ATM?"},
+    {c:"Bank/ATM", i:"🏧", j:"お<ruby>金<rt>かね</rt></ruby>をおろしたいです", t:"Saya ingin tarik tunai"},
+    {c:"Bank/ATM", i:"🏧", j:"カードが<ruby>戻<rt>もど</rt></ruby>ってきません", t:"Kartu saya tertelan"},
+    {c:"Bank/ATM", i:"🏧", j:"<ruby>暗証番号<rt>あんしょうばんごう</rt></ruby>がちがいます", t:"Nomor PIN salah"},
+    {c:"Bank/ATM", i:"🏧", j:"<ruby>手数料<rt>てすうりょう</rt></ruby>はいくらですか？", t:"Biaya adminnya berapa?"},
+    {c:"Bank/ATM", i:"🏧", j:"カードが<ruby>使<rt>つか</rt></ruby>えません", t:"Kartunya tidak bisa dipakai"},
+    {c:"Bank/ATM", i:"🏧", j:"<ruby>現金<rt>げんきん</rt></ruby>のみですか？", t:"Apakah hanya bisa tunai?"},
+    {c:"Bank/ATM", i:"🏧", j:"お<ruby>金<rt>かね</rt></ruby>を<ruby>預<rt>あず</rt></ruby>けたいです", t:"Saya ingin setor tunai"},
+    {c:"Bank/ATM", i:"🏧", j:"<ruby>通帳<rt>つうちょう</rt></ruby>を<ruby>作<rt>つく</rt></ruby>りたいです", t:"Saya ingin buat buku tabungan"},
+    {c:"Bank/ATM", i:"🏧", j:"このカードは<ruby>使<rt>つか</rt></ruby>えますか？", t:"Apakah kartu ini bisa dipakai?"},
+
+    {c:"Kouban", i:"👮", j:"スマホをなくしました", t:"Saya kehilangan ponsel"},
+    {c:"Kouban", i:"👮", j:"<ruby>財布<rt>さいふ</rt></ruby>を<ruby>盗<rt>ぬす</rt></ruby>まれました", t:"Dompet saya dicuri"},
+    {c:"Kouban", i:"👮", j:"パスポートをなくしました", t:"Paspor saya hilang"},
+    {c:"Kouban", i:"👮", j:"<ruby>道<rt>みち</rt></ruby>を<ruby>教<rt>おし</rt></ruby>えてください", t:"Tolong beri tahu jalannya"},
+    {c:"Kouban", i:"👮", j:"<ruby>紛失届<rt>ふんしつとどけ</rt></ruby>を<ruby>書<rt>か</rt></ruby>きます", t:"Saya mau tulis laporan kehilangan"},
+    {c:"Kouban", i:"👮", j:"ここに<ruby>誰<rt>だれ</rt></ruby>もいません", t:"Di sini tidak ada orang"},
+    {c:"Kouban", i:"👮", j:"<ruby>駅<rt>えき</rt></ruby>はどちらですか？", t:"Stasiun ke arah mana?"},
+    {c:"Kouban", i:"👮", j:"<ruby>事故<rt>じこ</rt></ruby>がありました", t:"Ada kecelakaan"},
+    {c:"Kouban", i:"👮", j:"<ruby>助<rt>たす</rt></ruby>けてください！", t:"Tolong bantu saya!"},
+    {c:"Kouban", i:"👮", j:"タクシーの<ruby>乗<rt>の</rt></ruby>り<ruby>場<rt>ば</rt></ruby>は？", t:"Tempat naik taksi di mana?"},
+
+    {c:"Rumah Sakit", i:"🏥", j:"<ruby>気分<rt>きぶん</rt></ruby>が<ruby>悪<rt>わる</rt></ruby>いです", t:"Saya merasa tidak enak badan"},
+    {c:"Rumah Sakit", i:"🏥", j:"<ruby>熱<rt>ねつ</rt></ruby>が<ruby>高<rt>たか</rt></ruby>いです", t:"Saya demam tinggi"},
+    {c:"Rumah Sakit", i:"🏥", j:"<ruby>頭<rt>あたま</rt></ruby>が<ruby>痛<rt>いた</rt></ruby>いです", t:"Kepala saya sakit"},
+    {c:"Rumah Sakit", i:"🏥", j:"<ruby>吐<rt>は</rt></ruby>き<ruby>気<rt>け</rt></ruby>がします", t:"Saya merasa mual"},
+    {c:"Rumah Sakit", i:"🏥", j:"お<ruby>腹<rt>なか</rt></ruby>が<ruby>痛<rt>いた</rt></ruby>いです", t:"Perut saya sakit"},
+    {c:"Rumah Sakit", i:"🏥", j:"<ruby>診察<rt>しんさつ</rt></ruby>をお<ruby>願<rt>ねが</rt></ruby>いします", t:"Saya ingin periksa kesehatan"},
+    {c:"Rumah Sakit", i:"🏥", j:"<ruby>保険証<rt>ほけんしょう</rt></ruby>はありますか？", t:"Ada kartu asuransi?"},
+    {c:"Rumah Sakit", i:"🏥", j:"<ruby>薬局<rt>やっきょく</rt></ruby>はどこですか？", t:"Apotek di mana?"},
+    {c:"Rumah Sakit", i:"🏥", j:"<ruby>救急車<rt>きゅうきゅうしゃ</rt></ruby>を<ruby>呼<rt>よ</rt></ruby>んで！", t:"Panggilkan ambulans!"},
+    {c:"Rumah Sakit", i:"🏥", j:"<ruby>怪我<rt>けが</rt></ruby>をしました", t:"Saya terluka"},
+
+    {c:"Toko Baju", i:"👕", j:"<ruby>試着<rt>しちゃく</rt></ruby>してもいいですか？", t:"Boleh saya coba bajunya?"},
+    {c:"Toko Baju", i:"👕", j:"これを<ruby>買<rt>か</rt></ruby>います", t:"Saya beli yang ini"},
+    {c:"Toko Baju", i:"👕", j:"Ｌサイズありますか？", t:"Ada ukuran L?"},
+    {c:"Toko Baju", i:"👕", j:"これを<ruby>返品<rt>へんぴん</rt></ruby>したいです", t:"Saya ingin retur barang ini"},
+    {c:"Toko Baju", i:"👕", j:"<ruby>鏡<rt>かがみ</rt></ruby>はどこですか？", t:"Cerminnya di mana?"},
+    {c:"Toko Baju", i:"👕", j:"もっと<ruby>安<rt>やす</rt></ruby>いのは？", t:"Ada yang lebih murah?"},
+    {c:"Toko Baju", i:"👕", j:"別の<ruby>色<rt>いろ</rt></ruby>ありますか？", t:"Ada warna lain?"},
+    {c:"Toko Baju", i:"👕", j:"ちょっと<ruby>派手<rt>はで</rt></ruby>です", t:"Agak terlalu mencolok"},
+    {c:"Toko Baju", i:"👕", j:"<ruby>免税<rt>めんぜい</rt></ruby>はできますか？", t:"Bisa bebas pajak?"},
+    {c:"Toko Baju", i:"👕", j:"<ruby>袋<rt>ふくろ</rt></ruby>はいりません", t:"Tidak perlu kantong plastik"},
+
+    {c:"Restoran", i:"🍱", j:"お<ruby>会計<rt>かいけい</rt></ruby>をお<ruby>願<rt>ね</rt></ruby>いします", t:"Minta bon / Tolong bayar"},
+    {c:"Restoran", i:"🍱", j:"おすすめはありますか？", t:"Rekomendasinya apa?"},
+    {c:"Restoran", i:"🍱", j:"これをください", t:"Minta yang ini"},
+    {c:"Restoran", i:"🍱", j:"お<ruby>水<rt>みず</rt></ruby>をください", t:"Minta air minum"},
+    {c:"Restoran", i:"🍱", j:"メニューお<ruby>願<rt>ね</rt></ruby>いします", t:"Minta menunya"},
+    {c:"Restoran", i:"🍱", j:"おいしかったです", t:"Makanannya enak"},
+    {c:"Restoran", i:"🍱", j:"<ruby>何人<rt>なんにん</rt></ruby>ですか？", t:"Berapa orang?"},
+    {c:"Restoran", i:"🍱", j:"<ruby>禁煙席<rt>きんえんせき</rt></ruby>がいいです", t:"Minta area bebas rokok"},
+    {c:"Restoran", i:"🍱", j:"まだ<ruby>来<rt>こ</rt></ruby>ないです", t:"Pesanan belum datang"},
+    {c:"Restoran", i:"🍱", j:"ごちそうさまでした", t:"Terima kasih makanannya (selesai)"},
+
+    {c:"Stasiun", i:"🚉", j:"<ruby>出口<rt>でぐち</rt></ruby>はどこですか？", t:"Pintu keluar di mana?"},
+    {c:"Stasiun", i:"🚉", j:"<ruby>切符<rt>きっぷ</rt></ruby>はどこですか？", t:"Tiket di mana?"},
+    {c:"Stasiun", i:"🚉", j:"<ruby>渋谷<rt>しぶや</rt></ruby>までいくらですか？", t:"Ke Shibuya berapa?"},
+    {c:"Stasiun", i:"🚉", j:"<ruby>終電<rt>しゅうでん</rt></ruby>は何時ですか？", t:"Kereta terakhir jam berapa?"},
+    {c:"Stasiun", i:"🚉", j:"トイレはどこですか？", t:"Toilet di mana?"},
+    {c:"Stasiun", i:"🚉", j:"ここで<ruby>降<rt>お</rt></ruby>ります", t:"Saya turun di sini"},
+    {c:"Stasiun", i:"🚉", j:"<ruby>ホーム<rt>ほーむ</rt></ruby>はどこですか？", t:"Peronnya di mana?"},
+    {c:"Stasiun", i:"🚉", j:"<ruby>間違<rt>まちが</rt></ruby>えました", t:"Saya salah (naik kereta)"},
+    {c:"Stasiun", i:"🚉", j:"<ruby>特急<rt>とっきゅう</rt></ruby>は<ruby>止<rt>と</rt></ruby>まりますか？", t:"Apakah kereta ekspres berhenti?"},
+    {c:"Stasiun", i:"🚉", j:"タクシー<ruby>乗<rt>の</rt></ruby>り<ruby>場<rt>ば</rt></ruby>はどこ？", t:"Pangkalan taksi di mana?"},
+
+    {c:"Konbini", i:"🏪", j:"お<ruby>箸<rt>はし</rt></ruby>をください", t:"Minta sumpit"},
+    {c:"Konbini", i:"🏪", j:"<ruby>温<rt>あたた</rt></ruby>めますか？", t:"Mau dipanaskan?"},
+    {c:"Konbini", i:"🏪", j:"レシートはいりません", t:"Tidak perlu struk"},
+    {c:"Konbini", i:"🏪", j:"スプーンありますか？", t:"Ada sendok?"},
+    {c:"Konbini", i:"🏪", j:"チャージお<ruby>願<rt>ね</rt></ruby>いします", t:"Isi saldo (Suica/IC)"},
+    {c:"Konbini", i:"🏪", j:"トイレ<ruby>貸<rt>か</rt></ruby>してください", t:"Boleh pinjam toilet?"},
+    {c:"Konbini", i:"🏪", j:"<ruby>袋<rt>ふくろ</rt></ruby>ください", t:"Minta kantong plastik"},
+    {c:"Konbini", i:"🏪", j:"ポイントカードありません", t:"Tidak punya kartu poin"},
+    {c:"Konbini", i:"🏪", j:"お<ruby>湯<rt>ゆ</rt></ruby>はありますか？", t:"Ada air panas?"},
+    {c:"Konbini", i:"🏪", j:"<ruby>支払<rt>しはら</rt></ruby>いはＳｕｉｃａで", t:"Bayar pakai Suica"},
+
+    {c:"Hotel", i:"🏨", j:"チェックインをお<ruby>願<rt>ね</rt></ruby>いします", t:"Tolong bantu saya check-in"},
+    {c:"Hotel", i:"🏨", j:"<ruby>荷物<rt>にもつ</rt></ruby>を<ruby>預<rt>あず</rt></ruby>けたいです", t:"Saya ingin titip koper"},
+    {c:"Hotel", i:"🏨", j:"Ｗｉ－Ｆｉのパスワードは？", t:"Apa password Wi-Fi?"},
+    {c:"Hotel", i:"🏨", j:"<ruby>鍵<rt>かぎ</rt></ruby>をなくしました", t:"Kunci saya hilang"},
+    {c:"Hotel", i:"🏨", j:"<ruby>朝食<rt>ちょうしょく</rt></ruby>は何時ですか？", t:"Sarapan jam berapa?"},
+    {c:"Hotel", i:"🏨", j:"お<ruby>湯<rt>ゆ</rt></ruby>が出ません", t:"Air panas tidak keluar"},
+    {c:"Hotel", i:"🏨", j:"<ruby>掃除<rt>そうじ</rt></ruby>はいりません", t:"Tidak perlu dibersihkan"},
+    {c:"Hotel", i:"🏨", j:"近くにコンビニある？", t:"Ada konbini dekat sini?"},
+    {c:"Hotel", i:"🏨", j:"チェックアウトします", t:"Saya mau check-out"},
+    {c:"Hotel", i:"🏨", j:"タクシーを<ruby>呼<rt>よ</rt></ruby>んで", t:"Tolong panggilkan taksi"},
+
+    {c:"Wisata", i:"⛩️", j:"<ruby>写真<rt>しゃしん</rt></ruby>を<ruby>撮<rt>と</rt></ruby>ってもいい？", t:"Boleh ambil foto?"},
+    {c:"Wisata", i:"⛩️", j:"ここはどこですか？", t:"Ini di mana?"},
+    {c:"Wisata", i:"⛩️", j:"<ruby>地図<rt>ちず</rt></ruby>をください", t:"Minta peta"},
+    {c:"Wisata", i:"⛩️", j:"<ruby>入場料<rt>にゅうじょうりょう</rt></ruby>はいくら？", t:"Berapa biaya masuknya?"},
+    {c:"Wisata", i:"⛩️", j:"<ruby>撮影禁止<rt>さつえいきんし</rt></ruby>ですか？", t:"Apakah dilarang memotret?"},
+    {c:"Wisata", i:"⛩️", j:"とてもきれいです", t:"Sangat indah"},
+    {c:"Wisata", i:"⛩️", j:"何時までですか？", t:"Buka sampai jam berapa?"},
+    {c:"Wisata", i:"⛩️", j:"パンフレットありますか？", t:"Ada brosur?"},
+    {c:"Wisata", i:"⛩️", j:"<ruby>有名<rt>ゆうめい</rt></ruby>な<ruby>物<rt>もの</rt></ruby>は何？", t:"Apa yang paling terkenal?"},
+    {c:"Wisata", i:"⛩️", j:"また<ruby>来<rt>く</rt></ruby>たいです", t:"Saya ingin datang lagi"},
+
+    {c:"Transport", i:"🚕", j:"ここまでお願いします", t:"Tolong sampai sini (peta)"},
+    {c:"Transport", i:"🚕", j:"まっすぐ<ruby>行<rt>い</rt></ruby>ってください", t:"Tolong lurus saja"},
+    {c:"Transport", i:"🚕", j:"ここで<ruby>止<rt>と</rt></ruby>めてください", t:"Berhenti di sini saja"},
+    {c:"Transport", i:"🚕", j:"<ruby>急<rt>いそ</rt></ruby>いでいます", t:"Saya terburu-buru"},
+    {c:"Transport", i:"🚕", j:"バス<ruby>停<rt>てい</rt></ruby>はどこですか？", t:"Halte bus di mana?"},
+    {c:"Transport", i:"🚕", j:"お<ruby>釣<rt>つ</rt></ruby>りはいりません", t:"Ambil saja kembaliannya"},
+    {c:"Transport", i:"🚕", j:"トランクを<ruby>開<rt>あ</rt></ruby>けて", t:"Tolong buka bagasinya"},
+    {c:"Transport", i:"🚕", j:"どのバスが<ruby>渋谷<rt>しぶや</rt></ruby>へ？", t:"Bus mana yang ke Shibuya?"},
+    {c:"Transport", i:"🚕", j:"<ruby>領収書<rt>りょうしゅうしょ</rt></ruby>をください", t:"Minta kuitansi"},
+    {c:"Transport", i:"🚕", j:"<ruby>左<rt>ひだり</rt></ruby>に<ruby>曲<rt>ま</rt></ruby>がってください", t:"Tolong belok kiri"},
+
+    {c:"Supermarket", i:"🛒", j:"お<ruby>会計<rt>かいけい</rt></ruby>はどこですか？", t:"Kasirnya di mana?"},
+    {c:"Supermarket", i:"🛒", j:"<ruby>値段<rt>ねだん</rt></ruby>はいくらですか？", t:"Berapa harganya?"},
+    {c:"Supermarket", i:"🛒", j:"<ruby>袋<rt>ふくろ</rt></ruby>はありますか？", t:"Apakah ada kantong plastik?"},
+    {c:"Supermarket", i:"🛒", j:"カードは<ruby>使<rt>つか</rt></ruby>えますか？", t:"Bisa pakai kartu?"},
+    {c:"Supermarket", i:"🛒", j:"<ruby>現金<rt>げんきん</rt></ruby>で<ruby>払<rt>はら</rt></ruby>います", t:"Bayar pakai tunai"},
+    {c:"Supermarket", i:"🛒", j:"これは<ruby>豚肉<rt>ぶたにく</rt></ruby>ですか？", t:"Apakah ini daging babi?"},
+    {c:"Supermarket", i:"🛒", j:"<ruby>賞味期限<rt>しょうみきげん</rt></ruby>はいつ？", t:"Kapan kadaluwarsanya?"},
+    {c:"Supermarket", i:"🛒", j:"トイレを<ruby>借<rt>か</rt></ruby>りてもいい？", t:"Boleh pinjam toiletnya?"},
+    {c:"Supermarket", i:"🛒", j:"もっと<ruby>安<rt>やす</rt></ruby>いのはありますか？", t:"Ada yang lebih murah?"},
+    {c:"Supermarket", i:"🛒", j:"<ruby>半額<rt>はんがく</rt></ruby>ですか？", t:"Apakah diskon 50%?"},
+
+    {c:"Dasar", i:"🗣️", j:"すみません", t:"Permisi / Maaf"},
+    {c:"Dasar", i:"🗣️", j:"ありがとうございます", t:"Terima kasih"},
+    {c:"Dasar", i:"🗣️", j:"はじめまして", t:"Salam kenal"},
+    {c:"Dasar", i:"🗣️", j:"<ruby>日本人<rt>にほんじん</rt></ruby>の<ruby>友達<rt>ともだち</rt></ruby>がほしい", t:"Pengen teman orang Jepang"},
+    {c:"Dasar", i:"🗣️", j:"もう<ruby>一度<rt>いちど</rt></ruby>お<ruby>願<rt>ね</rt></ruby>いします", t:"Tolong ulangi sekali lagi"},
+    {c:"Dasar", i:"🗣️", j:"お<ruby>元気<rt>げんき</rt></ruby>ですか？", t:"Apa kabar?"},
+    {c:"Dasar", i:"🗣️", j:"<ruby>大丈夫<rt>だいじょうぶ</rt></ruby>です", t:"Gak apa-apa / Oke"},
+    {c:"Dasar", i:"🗣️", j:"<ruby>日本語<rt>にほんご</rt></ruby>を<ruby>勉強<rt>べんきょう</rt></ruby>しています", t:"Saya sedang belajar bahasa Jepang"},
+    {c:"Dasar", i:"🗣️", j:"<ruby>日本語<rt>にほんご</rt></ruby>が下手です", t:"Bahasa Jepang saya jelek"},
+    {c:"Dasar", i:"🗣️", j:"また会いましょう", t:"Sampai jumpa lagi"}
+];
+
+let qSet = [], qIdx = 0, score = 0, maxQ = 0;
+
+function goHome() {
+    hideAll();
+    document.getElementById('m-home').classList.remove('hidden');
+    const cats = [...new Set(db.map(x => x.c))];
+    document.getElementById('m-grid').innerHTML = cats.map(c => {
+        const item = db.find(x => x.c === c);
+        return `<div class="item" onclick="goStudy('${c}')"><span>${item.i}</span><b>${c}</b></div>`;
+    }).join('');
+}
+
+function goStudy(cat) {
+    hideAll();
+    document.getElementById('m-study').classList.remove('hidden');
+    document.getElementById('st-title').innerText = "Kategori: " + cat;
+    const items = db.filter(x => x.c === cat);
+    document.getElementById('list-container').innerHTML = items.map(x => `
+        <div class="box">
+            <span class="jp">${x.j}</span>
+            <span class="id">${x.t}</span>
+        </div>
+    `).join('');
+}
+
+function startQuiz(n) {
+    maxQ = n;
+    qSet = [...db].sort(() => 0.5 - Math.random()).slice(0, n);
+    qIdx = 0; score = 0;
+    hideAll();
+    document.getElementById('m-quiz').classList.remove('hidden');
+    renderQuiz();
+}
+
+function resetQuiz() {
+    if(confirm("Ulangi kuis dari awal?")) startQuiz(maxQ);
+}
+
+function renderQuiz() {
+    if(qIdx >= qSet.length) { showResult(); return; }
+    const data = qSet[qIdx];
+    document.getElementById('next-btn').classList.add('hidden');
+    document.getElementById('q-prog').innerText = "SOAL " + (qIdx + 1) + " / " + qSet.length;
+    document.getElementById('q-txt').innerText = data.t;
+    
+    let opts = [data];
+    while(opts.length < 3) {
+        let r = db[Math.floor(Math.random() * db.length)];
+        if(!opts.some(o => o.j === r.j)) opts.push(r);
+    }
+    opts.sort(() => 0.5 - Math.random());
+    
+    document.getElementById('q-opts').innerHTML = opts.map(o => {
+        const plain = o.j.replace(/<rt>.*?<\/rt>|<ruby>|<\/ruby>/g, "");
+        return `<button class="opt" onclick="check(this, ${o.j === data.j})">${plain}</button>`;
+    }).join('');
+}
+
+function check(btn, isCorrect) {
+    const opts = document.querySelectorAll('.opt');
+    opts.forEach(b => b.disabled = true);
+    if(isCorrect) {
+        btn.classList.add('right');
+        score++;
+    } else {
+        btn.classList.add('wrong');
+        const correctJp = qSet[qIdx].j.replace(/<rt>.*?<\/rt>|<ruby>|<\/ruby>/g, "");
+        opts.forEach(b => { if(b.innerText === correctJp) b.classList.add('right'); });
+    }
+    document.getElementById('q-scr').innerText = "Skor: " + Math.round((score/(qIdx+1))*100);
+    document.getElementById('next-btn').classList.remove('hidden');
+    qIdx++;
+}
+
+function showResult() {
+    hideAll();
+    document.getElementById('m-res').classList.remove('hidden');
+    const total = qIdx === 0 ? 0 : Math.round((score / qIdx) * 100);
+    document.getElementById('f-scr').innerText = total;
+    document.getElementById('f-msg').innerText = "Kamu menjawab benar " + score + " dari " + qIdx + " soal.\n" + (total >= 80 ? "Hebat! Pertahankan!" : "Ayo belajar lagi!");
+}
+
+function hideAll() {
+    document.getElementById('m-home').classList.add('hidden');
+    document.getElementById('m-study').classList.add('hidden');
+    document.getElementById('m-quiz').classList.add('hidden');
+    document.getElementById('m-res').classList.add('hidden');
+}
+
+goHome();
+</script>
+</body>
+</html>
