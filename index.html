@@ -3,41 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nihongo Daily - Final Fixed</title>
+    <title>Nihongo Daily - Just Reza</title>
     <style>
         :root { --p: #1a2a6c; --s: #ffafbd; --bg: #f4f7f6; --ok: #28a745; --err: #dc3545; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); margin: 0; padding: 10px; font-family: 'Segoe UI', sans-serif; }
-        
         .card { max-width: 500px; margin: auto; background: white; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; min-height: 90vh; display: flex; flex-direction: column; }
-        
         header { background: var(--p); color: white; padding: 20px 15px; text-align: center; border-bottom: 5px solid var(--s); }
         .content { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
-        
-        /* Grid Menu Utama */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .item { background: #fff; border: 1px solid #eee; padding: 12px 5px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.2s; }
         .item:active { transform: scale(0.95); background: #f9f9f9; }
         .item span { font-size: 1.4rem; display: block; margin-bottom: 5px; }
         .item b { font-size: 0.85rem; color: var(--p); }
-
-        /* Tombol */
         .btn { width: 100%; padding: 14px; margin-bottom: 10px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1rem; }
         .btn-p { background: var(--p); color: white; }
         .btn-g { background: #e9ecef; color: #495057; margin-bottom: 15px; }
         .btn-outline { background: transparent; border: 1px solid #ccc; color: #666; }
         .btn-red { background: #fff1f1; color: var(--err); border: 1px solid var(--err); }
-
-        /* List Belajar */
         .box { background: #fff; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid var(--s); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .jp { font-size: 1.15rem; font-weight: bold; color: var(--p); display: block; line-height: 1.8; }
         .id { color: #666; font-size: 0.9rem; border-top: 1px dashed #eee; margin-top: 8px; padding-top: 8px; display: block; }
-        
-        /* Kuis */
         .opt { width: 100%; padding: 15px; margin: 8px 0; border: 2px solid #f0f0f0; border-radius: 12px; background: white; text-align: left; font-size: 1rem; }
         .right { background: #d4edda !important; border-color: var(--ok) !important; color: #155724; }
         .wrong { background: #f8d7da !important; border-color: var(--err) !important; color: #721c24; }
-        
         .hidden { display: none !important; }
         #list-container { max-height: 65vh; overflow-y: auto; }
         ruby rt { color: #e83e8c; font-size: 0.55em; }
@@ -47,17 +36,15 @@
 
 <div class="card">
     <header>
-        <h2 style="margin:0; font-size: 1.3rem;">NIHONGO DAILY</h2>
-        <div style="font-size:0.75rem; opacity:0.9; margin-top:5px;">13 Kategori • 130 Kalimat • Full Hiragana</div>
+        <h2 style="margin:0; font-size: 1.4rem;">🇯🇵 NIHONGO DAILY</h2>
+        <div style="font-size:0.75rem; opacity:0.9; margin-top:5px; font-weight: bold;">List Kalimat Natural & Situasional oleh Just Reza</div>
     </header>
 
     <div id="m-home" class="content">
-        <p style="font-weight:bold; color:var(--p); margin: 0 0 12px 0;">📍 Pilih Kategori Belajar:</p>
+        <p style="font-weight:bold; color:var(--p); margin: 0 0 12px 0;">📍 Pilih Kategori:</p>
         <div id="m-grid" class="grid"></div>
-        
         <hr style="width:100%; border:0; border-top:1px solid #eee; margin: 10px 0 20px 0;">
-        
-        <p style="font-weight:bold; color:var(--p); margin: 0 0 12px 0;">✍️ Uji Kemampuan (Kuis):</p>
+        <p style="font-weight:bold; color:var(--p); margin: 0 0 12px 0;">✍️ Mulai Kuis:</p>
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
             <button class="btn btn-p" onclick="startQuiz(10)">10</button>
             <button class="btn btn-p" onclick="startQuiz(25)">25</button>
@@ -66,7 +53,7 @@
     </div>
 
     <div id="m-study" class="content hidden">
-        <button class="btn btn-g" onclick="goHome()">⬅️ Kembali ke Menu</button>
+        <button class="btn btn-g" onclick="goHome()">⬅️ Kembali</button>
         <h3 id="st-title" style="text-align:center; color:var(--p); margin-top:0;"></h3>
         <div id="list-container"></div>
     </div>
@@ -81,24 +68,35 @@
         <div style="margin-top:20px;">
             <button id="next-btn" class="btn btn-p hidden" onclick="renderQuiz()">Lanjut ➔</button>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <button class="btn btn-outline" onclick="showResult()">Selesai</button>
-                <button class="btn btn-red" onclick="resetQuiz()">Reset</button>
+                <button class="btn btn-red" onclick="startQuiz(maxQ)">🔄 Reset</button>
+                <button class="btn btn-outline" onclick="showResult()">🏁 Selesai</button>
             </div>
         </div>
     </div>
 
     <div id="m-res" class="content hidden" style="text-align:center; justify-content: center;">
         <span style="font-size:4rem;">🏆</span>
-        <h2 style="margin:10px 0">SKOR KAMU</h2>
+        <h2 style="margin:10px 0">HASIL AKHIR</h2>
         <div id="f-scr" style="font-size:5rem; font-weight:bold; color:var(--p)">0</div>
-        <p id="f-msg" style="color:#666; margin-bottom:30px; line-height:1.5;"></p>
-        <button class="btn btn-p" onclick="goHome()">Main Lagi</button>
+        <p id="f-msg" style="color:#666; margin-bottom:30px; line-height:1.5; white-space: pre-line;"></p>
+        <button class="btn btn-p" onclick="goHome()">Ke Menu Utama</button>
     </div>
 </div>
 
 <script>
-// DATABASE 130 KALIMAT
 const db = [
+    // DASAR SEKARANG DI PALING ATAS
+    {c:"Dasar", i:"🗣️", j:"すみません", t:"Permisi / Maaf"},
+    {c:"Dasar", i:"🗣️", j:"ありがとうございます", t:"Terima kasih"},
+    {c:"Dasar", i:"🗣️", j:"はじめまして", t:"Salam kenal"},
+    {c:"Dasar", i:"🗣️", j:"<ruby>日本人<rt>にほんじん</rt></ruby>の<ruby>友達<rt>ともだち</rt></ruby>がほしい", t:"Pengen teman orang Jepang"},
+    {c:"Dasar", i:"🗣️", j:"もう<ruby>一度<rt>いちど</rt></ruby>お<ruby>願<rt>ね</rt></ruby>いします", t:"Tolong ulangi sekali lagi"},
+    {c:"Dasar", i:"🗣️", j:"お<ruby>元気<rt>げんき</rt></ruby>ですか？", t:"Apa kabar?"},
+    {c:"Dasar", i:"🗣️", j:"<ruby>大丈夫<rt>だいじょうぶ</rt></ruby>です", t:"Gak apa-apa / Oke"},
+    {c:"Dasar", i:"🗣️", j:"<ruby>日本語<rt>にほんご</rt></ruby>を<ruby>勉強<rt>べんきょう</rt></ruby>しています", t:"Saya sedang belajar bahasa Jepang"},
+    {c:"Dasar", i:"🗣️", j:"<ruby>日本語<rt>にほんご</rt></ruby>が下手です", t:"Bahasa Jepang saya jelek"},
+    {c:"Dasar", i:"🗣️", j:"また会いましょう", t:"Sampai jumpa lagi"},
+
     {c:"Airport", i:"✈️", j:"パスポートです", t:"Ini paspor saya"},
     {c:"Airport", i:"✈️", j:"<ruby>搭乗<rt>とうじょう</rt></ruby>ゲートはどこですか？", t:"Gerbang keberangkatan di mana?"},
     {c:"Airport", i:"✈️", j:"<ruby>両替<rt>りょうがえ</rt></ruby>をしたいです", t:"Saya ingin tukar uang"},
@@ -154,11 +152,11 @@ const db = [
     {c:"Toko Baju", i:"👕", j:"<ruby>免税<rt>めんぜい</rt></ruby>はできますか？", t:"Bisa bebas pajak?"},
     {c:"Toko Baju", i:"👕", j:"<ruby>袋<rt>ふくろ</rt></ruby>はいりません", t:"Tidak perlu kantong plastik"},
 
-    {c:"Restoran", i:"🍱", j:"お<ruby>会計<rt>かいけい</rt></ruby>をお<ruby>願<rt>ね</rt></ruby>いします", t:"Minta bon / Tolong bayar"},
+    {c:"Restoran", i:"🍱", j:"お<ruby>会計<rt>かいけい</rt></ruby>をお<ruby>願<rt>ね</rt></ruby>iします", t:"Minta bon / Tolong bayar"},
     {c:"Restoran", i:"🍱", j:"おすすめはありますか？", t:"Rekomendasinya apa?"},
     {c:"Restoran", i:"🍱", j:"これをください", t:"Minta yang ini"},
     {c:"Restoran", i:"🍱", j:"お<ruby>水<rt>みず</rt></ruby>をください", t:"Minta air minum"},
-    {c:"Restoran", i:"🍱", j:"メニューお<ruby>願<rt>ね</rt></ruby>いします", t:"Minta menunya"},
+    {c:"Restoran", i:"🍱", j:"メニューお<ruby>願<rt>ねが</rt></ruby>いします", t:"Minta menunya"},
     {c:"Restoran", i:"🍱", j:"おいしかったです", t:"Makanannya enak"},
     {c:"Restoran", i:"🍱", j:"<ruby>何人<rt>なんにん</rt></ruby>ですか？", t:"Berapa orang?"},
     {c:"Restoran", i:"🍱", j:"<ruby>禁煙席<rt>きんえんせき</rt></ruby>がいいです", t:"Minta area bebas rokok"},
@@ -229,18 +227,7 @@ const db = [
     {c:"Supermarket", i:"🛒", j:"<ruby>賞味期限<rt>しょうみきげん</rt></ruby>はいつ？", t:"Kapan kadaluwarsanya?"},
     {c:"Supermarket", i:"🛒", j:"トイレを<ruby>借<rt>か</rt></ruby>りてもいい？", t:"Boleh pinjam toiletnya?"},
     {c:"Supermarket", i:"🛒", j:"もっと<ruby>安<rt>やす</rt></ruby>いのはありますか？", t:"Ada yang lebih murah?"},
-    {c:"Supermarket", i:"🛒", j:"<ruby>半額<rt>はんがく</rt></ruby>ですか？", t:"Apakah diskon 50%?"},
-
-    {c:"Dasar", i:"🗣️", j:"すみません", t:"Permisi / Maaf"},
-    {c:"Dasar", i:"🗣️", j:"ありがとうございます", t:"Terima kasih"},
-    {c:"Dasar", i:"🗣️", j:"はじめまして", t:"Salam kenal"},
-    {c:"Dasar", i:"🗣️", j:"<ruby>日本人<rt>にほんじん</rt></ruby>の<ruby>友達<rt>ともだち</rt></ruby>がほしい", t:"Pengen teman orang Jepang"},
-    {c:"Dasar", i:"🗣️", j:"もう<ruby>一度<rt>いちど</rt></ruby>お<ruby>願<rt>ね</rt></ruby>いします", t:"Tolong ulangi sekali lagi"},
-    {c:"Dasar", i:"🗣️", j:"お<ruby>元気<rt>げんき</rt></ruby>ですか？", t:"Apa kabar?"},
-    {c:"Dasar", i:"🗣️", j:"<ruby>大丈夫<rt>だいじょうぶ</rt></ruby>です", t:"Gak apa-apa / Oke"},
-    {c:"Dasar", i:"🗣️", j:"<ruby>日本語<rt>にほんご</rt></ruby>を<ruby>勉強<rt>べんきょう</rt></ruby>しています", t:"Saya sedang belajar bahasa Jepang"},
-    {c:"Dasar", i:"🗣️", j:"<ruby>日本語<rt>にほんご</rt></ruby>が下手です", t:"Bahasa Jepang saya jelek"},
-    {c:"Dasar", i:"🗣️", j:"また会いましょう", t:"Sampai jumpa lagi"}
+    {c:"Supermarket", i:"🛒", j:"<ruby>半額<rt>はんがく</rt></ruby>ですか？", t:"Apakah diskon 50%?"}
 ];
 
 let qSet = [], qIdx = 0, score = 0, maxQ = 0;
@@ -270,15 +257,12 @@ function goStudy(cat) {
 
 function startQuiz(n) {
     maxQ = n;
+    // Semuanya dirandom setiap mulai atau reset
     qSet = [...db].sort(() => 0.5 - Math.random()).slice(0, n);
     qIdx = 0; score = 0;
     hideAll();
     document.getElementById('m-quiz').classList.remove('hidden');
     renderQuiz();
-}
-
-function resetQuiz() {
-    if(confirm("Ulangi kuis dari awal?")) startQuiz(maxQ);
 }
 
 function renderQuiz() {
@@ -322,14 +306,11 @@ function showResult() {
     document.getElementById('m-res').classList.remove('hidden');
     const total = qIdx === 0 ? 0 : Math.round((score / qIdx) * 100);
     document.getElementById('f-scr').innerText = total;
-    document.getElementById('f-msg').innerText = "Kamu menjawab benar " + score + " dari " + qIdx + " soal.\n" + (total >= 80 ? "Hebat! Pertahankan!" : "Ayo belajar lagi!");
+    document.getElementById('f-msg').innerText = `Benar ${score} dari ${qIdx} soal.\n${total >= 80 ? "Sugoi! Kamu hebat!" : "Jangan menyerah, coba lagi!"}`;
 }
 
 function hideAll() {
-    document.getElementById('m-home').classList.add('hidden');
-    document.getElementById('m-study').classList.add('hidden');
-    document.getElementById('m-quiz').classList.add('hidden');
-    document.getElementById('m-res').classList.add('hidden');
+    document.querySelectorAll('.content').forEach(c => c.classList.add('hidden'));
 }
 
 goHome();
